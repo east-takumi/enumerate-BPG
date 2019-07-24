@@ -1,13 +1,55 @@
-// class info{
-//     public static final int N = 0;
-//     public static int[] S = new int[2*N];
-//     public static long num = 0;
-//     public static int[][] G = new int[N][N];
-//     public static int p1, p2, p3, p4, p5;
-//     public static int not_output = 0;
-// }
+class info{
+    public static final int N = 0;
+    public static int[] S = new int[2*N];
+    public static long num = 0;
+    public static int[][] G = new int[N][N];
+    public static int p1, p2, p3, p4, p5;
+    public static int not_output = 0;
+}
 
-class bipartite {
+class enumerate{
+    public int enumerate(int parent, int n) {
+        int i, c;
+        c=check(n);
+
+        if(c==-1){
+            return 0;
+        }
+        if(c==0){
+            not_output++;
+
+        }
+
+        if(c!=0){
+            num++;
+        // reference(n,parent);
+        }
+
+        parent=(int)num;
+        for(i=0 ; i<2*n-1 ; i++){
+            if(S[i]==1 && S[i+1]==0){
+                S[i]=0;S[i+1]=1;
+                enumerate(parent,n);
+                S[i]=1;S[i+1]=0;
+                break;
+            }
+        }
+        for(i=0 ; i<2*n-2 ; i++){
+            if(S[i]==0 && S[i+1]==1){
+                if(S[i+2]==0){
+                    S[i+1]=0;S[i+2]=1;
+                    enumerate(parent,n);
+                    S[i+1]=1;S[i+2]=0;
+                }
+                break;
+            }
+        }
+        return 1;
+    } 
+}
+
+
+public class bipartite {
     public static final int N = 4;
     public static int[] S = new int[2*N];
     public static long num = 0;
@@ -15,17 +57,8 @@ class bipartite {
     public static int p1, p2, p3, p4, p5;
     public static int not_output = 0;
 
-    public static void main(String[] args) {
-    // ability a = new ability();
-        int i;
-        for(i=3; i <= N; i++){
-            num = 0;
-            initialize(i);
-            enumrate(0,i);
-        }
-    }
-
-    public int initialize(int n){
+    
+    public static int initialize(int n){
         int i;
         for(i=0; i<n; i++){
             S[i]=1;
@@ -36,7 +69,7 @@ class bipartite {
         return 0;
     }
 
-    public void reverse(int[] Si, int[] Sj, int n){
+    public static void reverse(int[] Si, int[] Sj, int n){
         int i;
         for(i=0 ; i<2*n ; i++){
             if(Si[2*n-i-1]==1) Sj[i]=0;
@@ -44,7 +77,7 @@ class bipartite {
         }
     }
 
-    public void reverse_on_perm(int[] Si,int n){
+    public static void reverse_on_perm(int[] Si,int n){
         int[] Q = new int[N];
         int[] P = new int[N];
         int i;
@@ -170,7 +203,7 @@ class bipartite {
         return 1;
     }
 
-    public int enumerate(int parent, int n){
+    public static int enumerate(int parent, int n){
         int i, c;
         c=check(n);
 
@@ -179,6 +212,7 @@ class bipartite {
         }
         if(c==0){
             not_output++;
+
         }
 
         if(c!=0){
@@ -205,8 +239,27 @@ class bipartite {
                 break;
             }
         }
-        return 1;
+        // return 1;
     }
+
+    public static void main(String[] args) {
+        // ability a = new ability();
+            int i;
+            for(i=3; i <= N; i++){
+                num = 0;
+                initialize(i);
+                enumrate(0,i);
+            }
+    
+            System.out.print(i+" ");
+            System.out.print(num+" ");
+            System.out.print(p1+" ");
+            System.out.print(p2+" ");
+            System.out.print(p3+" ");
+            System.out.print(p4+" ");
+            System.out.println(p5+" ");
+    }
+    
 }
 
 
