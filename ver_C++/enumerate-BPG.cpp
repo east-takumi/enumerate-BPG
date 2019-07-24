@@ -2,18 +2,19 @@
 #include <list>
 #include <iostream>
 #include <iterator> 
-#include<vector>
+#include <vector>
 // using namespace std; 
 
 
 #define N 16
+// #define N 4
 
 int S[2*N];
 long num=0;
 int G[N][N];
 int p1,p2,p3,p4,p5;
 int not_output=0;
-std::vector<int> index_top;
+std::vector<int> index_top(0, 0);
 std::list<std::vector<int> > list;
 FILE *fp1,*fp2,*fp3,*fp4,*fp5;
 
@@ -30,7 +31,8 @@ int initialize(int n){
 }
 
 //Initialize of Graph
-int initializeG(int n){
+int initializeG(int n)
+{
   int i,j;
   for(i=0 ; i<n ; i++){
     for(j=0 ; j<n ; j++){
@@ -39,6 +41,73 @@ int initializeG(int n){
   }
   return 0;
 }
+
+//Sequence to graph
+int Seq2Graph(int n)
+{
+  int left=0,right=0;
+  int i,j;
+  int S2[2*N];
+  int num_x=0;
+
+  for(i=0 ; i<2*n ; i++)
+    if(S[i]==1 && S[i+1]==1) num_x++;
+  
+  initializeG(n);
+  for(i=0 ; i<2*n ; i++){
+    if(S[i]==0 && S[i-1]==1){
+      S2[i]=-num_x;
+      S2[i-1]=-num_x;
+      num_x++;
+    }
+    else S2[i]=S[i];
+  }
+  /*
+  for(i=0 ; i<2*n ; i++)
+    printf("%d ",S2[i]);
+  printf("\n");
+  */
+  //left=num_x;
+  //right=num_x;
+  for(i=0 ; i<2*n ; i++){
+    if(S2[i]==1) left++;
+    else if(S2[i]==0) right++;
+    else{
+      //right -> left  adjacent
+      for(j=right ; j<left ; j++){
+	G[-S2[i]][j]=1;
+	G[j][-S2[i]]=1;
+      }
+      i++;
+    }
+  }
+  return 1;
+}
+
+
+
+//See Sequence and Graph
+int reference(int n,int parent)
+{
+  int i,j;
+  printf("parent number: %d\n",parent);
+  printf("graph number : %ld\n",num);
+  for(i=0 ; i<2*n ; i++) printf("%d ",S[i]);
+  printf("\n");
+
+  Seq2Graph(n);
+  for(i=0 ; i<n ; i++){
+    printf("%d -> ",i);
+    for(j=0 ; j<n ; j++){
+      if(G[i][j]==1) printf("%d,",j);
+    }
+    printf("\n");
+  }
+
+  printf("\n\n");
+  return 0;
+}
+
 
 int Seq2Perm(int *Q,int n){
   int i;
@@ -246,7 +315,7 @@ int check(int n){
 //     for(it = g.begin(); it != g.end(); ++it) 
 //         cout << '\t' << *it; 
 //     cout << '\n'; 
-// } 
+// }
 
 //Enumerate Sequence
 int enumerate(int parent,int n){
@@ -269,24 +338,28 @@ int enumerate(int parent,int n){
     // reference(n,parent);
   }
   
+
+  // std::vector<int> index_top(2);
   parent=num;
+
+  
+
   for(i=0 ; i<2*n-1 ; i++){
     if(S[i]==1 && S[i+1]==0){
-      // auto itr = index_top.begin();
-      // std::cout << *itr;
-      // *itr = i
-      // index.at(0) = i+1;;
-      // index.push_back(i);
-      // index.push_back(i+1);
+      // index_top.push_back(i);
+      // index_top.push_back(i+1);
+      // list.push_back(index_top);
+      // index_top.at(0) = i+1;
       // showlist(index_top);
-      // print(index_top);
       // printf("\n");
       S[i]=0;S[i+1]=1;
       enumerate(parent,n);
       S[i]=1;S[i+1]=0;
+      index_top.pop_back();
       break;
     }
   }
+
   for(i=0 ; i<2*n-2 ; i++){
     if(S[i]==0 && S[i+1]==1){
       if(S[i+2]==0){
@@ -309,8 +382,6 @@ int enumerate(int parent,int n){
 int main(){
   int i;
   FILE *fp;
-
-  list.push_front(index_top);
 
   fp=fopen("NumberBPG","w");
   fp1=fopen("pattern1","w");
