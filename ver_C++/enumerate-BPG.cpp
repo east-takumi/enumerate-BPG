@@ -3,19 +3,21 @@
 #include <iostream>
 #include <iterator> 
 #include <vector>
+#include <array>
 // using namespace std; 
 
 
-#define N 16
-// #define N 4
+// #define N 16
+#define N 5
 
 int S[2*N];
 long num=0;
 int G[N][N];
 int p1,p2,p3,p4,p5;
 int not_output=0;
-std::vector<int> index_top(0, 0);
-std::list<std::vector<int> > list;
+std::array<int, 2> point;
+// std::list<std::vector<int> > list;
+std::list<std::array<int, 2>> index;
 FILE *fp1,*fp2,*fp3,*fp4,*fp5;
 
 //Initialize of Sequence
@@ -310,16 +312,17 @@ int check(int n){
   return 1;
 }
 
-// void showlist(list <int> g) {
-//     list <int> :: iterator it; 
-//     for(it = g.begin(); it != g.end(); ++it) 
-//         cout << '\t' << *it; 
-//     cout << '\n'; 
-// }
+void showlist(std::vector <int> g) {
+    std::vector<int> :: iterator it; 
+    for(it = g.begin(); it != g.end(); ++it) 
+        std::cout << '\t' << *it; 
+    std::cout << '\n'; 
+}
 
 //Enumerate Sequence
 int enumerate(int parent,int n){
   int i,c;
+  std::vector<int> index_test;
   c=check(n);
   if(c==-1){
     // printf("Not non-negative\n");
@@ -337,28 +340,56 @@ int enumerate(int parent,int n){
     num++;
     // reference(n,parent);
   }
-  
 
-  // std::vector<int> index_top(2);
+  
   parent=num;
-
-  
-
   for(i=0 ; i<2*n-1 ; i++){
     if(S[i]==1 && S[i+1]==0){
-      // index_top.push_back(i);
-      // index_top.push_back(i+1);
-      // list.push_back(index_top);
-      // index_top.at(0) = i+1;
-      // showlist(index_top);
-      // printf("\n");
       S[i]=0;S[i+1]=1;
       enumerate(parent,n);
       S[i]=1;S[i+1]=0;
-      index_top.pop_back();
       break;
     }
+      // showlist(index_top);
+      // break;
+      // list.push_back(index_top);
+      // printf("%d", i);
+    }
+
+  // showlist(index_test);
+  // printf("%s", "S=");
+  // for(i=0; i<2*n; i++){
+  //   printf("%d", S[i]);
+  // }
+  // printf("\n");
+
+  for(i=0; i<index_top.size(); i++){
+    //  int& x = index_top.at(i);
+    if(i!=0) {
+      int& x = index_top.at(i);
+      index_top.at(0) = index_top[x];
+      int point = index_top[0];
+      S[point]=0; S[point+1]=1;
+      // printf("%s", "S1=");
+      // for(i=0; i<2*n; i++){
+      //   printf("%d", S[i]);
+      // }
+      // printf("\n");
+      stack.push(index_top);
+      // break;
+      enumerate(parent,n);
+      stack.pop();
+      S[point]=1; S[point+1]=0;
+    }
   }
+
+  // printf("%s", "S2=");
+  // for(i=0; i<2*n; i++){
+  //   printf("%d", S[i]);
+  // }
+  // printf("\n");
+  // stack.pop;
+  // S[index_test[i]]=1; S[index_test[i+1]]=0;
 
   for(i=0 ; i<2*n-2 ; i++){
     if(S[i]==0 && S[i+1]==1){
@@ -382,6 +413,8 @@ int enumerate(int parent,int n){
 int main(){
   int i;
   FILE *fp;
+
+  index_top.push_back(0);
 
   fp=fopen("NumberBPG","w");
   fp1=fopen("pattern1","w");
