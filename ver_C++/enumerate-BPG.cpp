@@ -1,10 +1,13 @@
 #include<stdio.h>
 #include <list>
 #include <iostream>
-#include <iterator> 
+#include <iterator>
 #include <vector>
 #include <array>
-// using namespace std; 
+#include <stack>
+#include <stdlib.h>
+
+using namespace std; 
 
 
 // #define N 16
@@ -15,11 +18,115 @@ long num=0;
 int G[N][N];
 int p1,p2,p3,p4,p5;
 int not_output=0;
-std::array<int, 2> point;
+array<int, 2> point;
+// doublylinkedlist index;
+// stack<doublylinkedlist> tree;
 // std::list<std::vector<int> > list;
-std::list<std::array<int, 2>> index;
+// list<array<int, 2>> index;
+// list<array<int, 2>>::iterator *itr = nullptr;
 FILE *fp1,*fp2,*fp3,*fp4,*fp5;
 
+class doublylinkedlist {
+   public:
+    struct node {
+      int val;
+      node* next;
+      node* prev;
+      node(int v_) : val(v_),next(NULL),prev(NULL) {};
+    };
+    node* head;
+    node* tail;
+
+    doublylinkedlist() {
+      head = NULL;
+      tail = NULL;
+    }
+    void printFromHead() {
+      node* temp = head;
+      cout<<"[ ";
+      while(temp) {
+        cout<<temp->val<<" ";
+        temp = temp->next;
+      }
+      cout<<"]"<<endl;
+    }
+    void printFromTail() {
+       node* temp = tail;
+       cout<<"[ ";
+       while(temp) {
+         cout<<temp->val<<" ";
+         temp = temp->prev;
+       }
+       cout<<"]"<<endl;
+    }
+    void addFromHead(int v_) {
+      if(head == NULL && tail == NULL) {
+        head = new node(v_);
+        tail = head;
+      }
+      else {
+        node* cur = head;
+        while(cur && v_ > cur->val) {
+          cur = cur->next;
+        }
+        if(cur == head) {
+          cur->prev = new node(v_);
+          cur->prev->next = head;
+          head = cur->prev;
+        }
+        else if(cur) {
+          cur->prev->next = new node(v_);
+          cur->prev->next->next = cur;
+          cur->prev->next->prev = cur->prev;
+          cur->prev = cur->prev->next;
+        }
+        else if(!cur) {
+          tail->next = new node(v_);
+          tail->next->prev = tail;
+          tail = tail->next;
+        }
+      }
+    }
+    void addFromTail(int v_) {
+      if(head == NULL && tail == NULL) {
+        tail = new node(v_);
+        head = head;
+      }
+      else {
+        node* cur = tail;
+        while(cur && v_ <= cur->val) {
+          cur = cur->prev;
+        }
+        if(cur == tail) {
+          cur->next = new node(v_);
+          cur->next->prev = tail;
+          tail = cur->next;
+        }
+        else if(cur) {
+          cur->next->prev = new node(v_);
+          cur->next->prev->prev = cur;
+          cur->next->prev->next = cur->next;
+          cur->next = cur->next->prev;
+        }
+        else if(!cur) {
+          head->prev = new node(v_);
+          head->prev->next = head;
+          head = head->prev;
+        }
+      }
+    }
+    
+    // int accesstNextNode() {
+    //   node* temp;
+    //   if(head){
+    //     return head;
+    //   }
+    //   else{
+    //     temp = head;
+    //     temp = temp->next;
+    //   rutun temp;
+    // }
+};
 //Initialize of Sequence
 int initialize(int n){
   int i;
@@ -312,12 +419,12 @@ int check(int n){
   return 1;
 }
 
-void showlist(std::vector <int> g) {
-    std::vector<int> :: iterator it; 
-    for(it = g.begin(); it != g.end(); ++it) 
-        std::cout << '\t' << *it; 
-    std::cout << '\n'; 
-}
+// void showlist(std::vector <int> g) {
+//     std::vector<int> :: iterator it; 
+//     for(it = g.begin(); it != g.end(); ++it) 
+//         std::cout << '\t' << *it; 
+//     std::cout << '\n'; 
+// }
 
 //Enumerate Sequence
 int enumerate(int parent,int n){
@@ -342,62 +449,27 @@ int enumerate(int parent,int n){
   }
 
   
+  // int count=0;
+
   parent=num;
   for(i=0 ; i<2*n-1 ; i++){
     if(S[i]==1 && S[i+1]==0){
       S[i]=0;S[i+1]=1;
+      // index.addFromTail(i);
+      // tree.push(index);
       enumerate(parent,n);
       S[i]=1;S[i+1]=0;
       break;
-    }
-      // showlist(index_top);
-      // break;
-      // list.push_back(index_top);
-      // printf("%d", i);
-    }
-
-  // showlist(index_test);
-  // printf("%s", "S=");
-  // for(i=0; i<2*n; i++){
-  //   printf("%d", S[i]);
-  // }
-  // printf("\n");
-
-  for(i=0; i<index_top.size(); i++){
-    //  int& x = index_top.at(i);
-    if(i!=0) {
-      int& x = index_top.at(i);
-      index_top.at(0) = index_top[x];
-      int point = index_top[0];
-      S[point]=0; S[point+1]=1;
-      // printf("%s", "S1=");
-      // for(i=0; i<2*n; i++){
-      //   printf("%d", S[i]);
-      // }
-      // printf("\n");
-      stack.push(index_top);
-      // break;
-      enumerate(parent,n);
-      stack.pop();
-      S[point]=1; S[point+1]=0;
+      // count++;
     }
   }
 
-  // printf("%s", "S2=");
-  // for(i=0; i<2*n; i++){
-  //   printf("%d", S[i]);
-  // }
-  // printf("\n");
-  // stack.pop;
-  // S[index_test[i]]=1; S[index_test[i+1]]=0;
+
+
 
   for(i=0 ; i<2*n-2 ; i++){
     if(S[i]==0 && S[i+1]==1){
       if(S[i+2]==0){
-      // list<int> index_bottom;
-      //  index_bottom.push_fornt(i);
-      //  index_bottom.push_back(i);
-      //  index_bottom.push_back(i+1);
         S[i+1]=0;S[i+2]=1;
         enumerate(parent,n);
         S[i+1]=1;S[i+2]=0;
@@ -410,11 +482,13 @@ int enumerate(int parent,int n){
 
 
 
+
+
 int main(){
   int i;
   FILE *fp;
 
-  index_top.push_back(0);
+  // index_top.push_back(0);
 
   fp=fopen("NumberBPG","w");
   fp1=fopen("pattern1","w");
@@ -447,3 +521,4 @@ int main(){
   }
   return 0;
 }
+
