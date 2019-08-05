@@ -1,23 +1,36 @@
 #include<stdio.h>
 #include <list>
 #include <iostream>
-#include <iterator> 
-#include <vector>
+#include <iterator>
+#include <stack>
 #include <array>
-// using namespace std; 
+#include <stdlib.h>
+
+using namespace std;
 
 
-// #define N 16
-#define N 5
+#define N 16
+// #define N 6
 
-int S[2*N];
+array<int, 2*N> S;
 long num=0;
 int G[N][N];
 int p1,p2,p3,p4,p5;
 int not_output=0;
-std::array<int, 2> point;
-// std::list<std::vector<int> > list;
-std::list<std::array<int, 2>> index;
+// doublylinkedlist index_test;
+list<int> index_upper, index_bottom;
+list<int>::iterator itr_upper = index_upper.begin();
+list<int>::iterator itr_bottom = index_bottom.begin();
+struct data{
+    array<int, 2*N> S;
+    list<int> index;
+};
+class data obj_data_upper;
+class data obj_data_bottom;
+stack<data> index_up_data, index_bottom_data;
+
+
+// list<array<int, 2>>::iterator *itr = nullptr;
 FILE *fp1,*fp2,*fp3,*fp4,*fp5;
 
 //Initialize of Sequence
@@ -54,7 +67,7 @@ int Seq2Graph(int n)
 
   for(i=0 ; i<2*n ; i++)
     if(S[i]==1 && S[i+1]==1) num_x++;
-  
+
   initializeG(n);
   for(i=0 ; i<2*n ; i++){
     if(S[i]==0 && S[i-1]==1){
@@ -77,8 +90,8 @@ int Seq2Graph(int n)
     else{
       //right -> left  adjacent
       for(j=right ; j<left ; j++){
-	G[-S2[i]][j]=1;
-	G[j][-S2[i]]=1;
+	       G[-S2[i]][j]=1;
+	       G[j][-S2[i]]=1;
       }
       i++;
     }
@@ -231,6 +244,9 @@ int check(int n){
     S3 is reverse of S2
    */
   for(i=0 ; i<2*n ; i++) S0[i]=S[i];
+  // printf("S0= ");
+  // for(i=0 ; i<2*n ; i++) printf("%d",S0[i]);
+  // printf("\n");
 
   for(i=1 ; i<2*n-1 ; i++){
     //non-negative?
@@ -248,8 +264,7 @@ int check(int n){
   reverse_on_perm(S2,n);
   // printf("S2= ");
   // for(i=0 ; i<2*n ; i++) printf("%d",S2[i]);
-  // printf("\n"); 
- 
+  // printf("\n");
 
   reverse(S2,S3,n);
   // printf("S3= ");
@@ -259,18 +274,22 @@ int check(int n){
 
   // H-flip
   c1=is_canonical(S0,S1,n);
+  // printf("c1= %d \n",c1);
   if(c1==-1) return -1;
   // V-flip
   c2=is_canonical(S0,S2,n);
+  // printf("c2= %d \n",c2);
   if(c2==-1) return 0;
   // R-flip
   c3=is_canonical(S0,S3,n);
+  // printf("c3= %d \n",c3);
   if(c3==-1) return 0;
 
   Seq2Perm(Q,n);
 
   c4=is_canonical(S2,S3,n);
   if(c4==-1) c4=0;
+  // printf("c4= %d \n",c4);
   // 線表現は1つ
   if(c1 && c2 && c3){
     p1++;
@@ -312,17 +331,16 @@ int check(int n){
   return 1;
 }
 
-void showlist(std::vector <int> g) {
-    std::vector<int> :: iterator it; 
-    for(it = g.begin(); it != g.end(); ++it) 
-        std::cout << '\t' << *it; 
-    std::cout << '\n'; 
+void showlist(list <int> g) {
+    list<int> :: iterator it;
+    for(it = g.begin(); it != g.end(); ++it)
+        std::cout << '\t' << *it;
+    std::cout << '\n';
 }
 
 //Enumerate Sequence
 int enumerate(int parent,int n){
   int i,c;
-  std::vector<int> index_test;
   c=check(n);
   if(c==-1){
     // printf("Not non-negative\n");
@@ -331,9 +349,9 @@ int enumerate(int parent,int n){
   if(c==0){
     not_output++;
     // printf("output =%d", not_output);
-    // printf("\n");
     // printf("Not output the sequence\n");
     // for(i=0 ; i<2*n ; i++) printf("%d ",S[i]);
+    // printf("\n");
   }
 
   if(c!=0){
@@ -341,63 +359,61 @@ int enumerate(int parent,int n){
     // reference(n,parent);
   }
 
-  
+
+
   parent=num;
+
+
+  index_upper.clear();
   for(i=0 ; i<2*n-1 ; i++){
     if(S[i]==1 && S[i+1]==0){
-      S[i]=0;S[i+1]=1;
-      enumerate(parent,n);
-      S[i]=1;S[i+1]=0;
-      break;
-    }
-      // showlist(index_top);
+      // S[i]=0;S[i+1]=1;
+      index_upper.push_back(i);
+      // tree.push(index_test);
+      // enumerate(parent,n);
+      // S[i]=1;S[i+1]=0;
       // break;
-      // list.push_back(index_top);
-      // printf("%d", i);
-    }
-
-  // showlist(index_test);
-  // printf("%s", "S=");
-  // for(i=0; i<2*n; i++){
-  //   printf("%d", S[i]);
-  // }
-  // printf("\n");
-
-  for(i=0; i<index_top.size(); i++){
-    //  int& x = index_top.at(i);
-    if(i!=0) {
-      int& x = index_top.at(i);
-      index_top.at(0) = index_top[x];
-      int point = index_top[0];
-      S[point]=0; S[point+1]=1;
-      // printf("%s", "S1=");
-      // for(i=0; i<2*n; i++){
-      //   printf("%d", S[i]);
-      // }
-      // printf("\n");
-      stack.push(index_top);
-      // break;
-      enumerate(parent,n);
-      stack.pop();
-      S[point]=1; S[point+1]=0;
     }
   }
 
-  // printf("%s", "S2=");
-  // for(i=0; i<2*n; i++){
-  //   printf("%d", S[i]);
-  // }
-  // printf("\n");
-  // stack.pop;
-  // S[index_test[i]]=1; S[index_test[i+1]]=0;
 
+  // showlist(index_upper);
+  for(itr_upper = index_upper.begin(); itr_upper!= index_upper.end(); ++itr_upper){
+    // tree.push_front(index_upper);
+    obj_data_upper.S=S;
+    // obj_data_upper.index=index_upper;
+    index_up_data.push(obj_data_upper);
+    S[int(*itr_upper)]=0; S[int(*itr_upper)+1]=1;
+    // printf("itr_upper = ");
+    // cout << *itr_upper;
+    // printf("\n");
+    enumerate(parent,n);
+    obj_data_upper = index_up_data.top();
+    S = obj_data_upper.S;
+    // index_upper = obj_data_upper.index;
+    index_up_data.pop();
+    // printf("index_upper = ");
+    // showlist(index_upper);
+    // printf("\n");
+    // printf("itr_upper = ");
+    // cout << *itr_upper;
+    // printf("\n");
+    // S[int(*itr_upper)]=1; S[int(*itr_upper)+1]=0;
+    // index_up_data.pop();
+    // for(i=0; i<2*N; i++){
+    //   printf("%d", S[i]);
+    // }
+    // printf("\n");
+    break;
+  }
+
+
+
+  // index_bottom.clear();
   for(i=0 ; i<2*n-2 ; i++){
     if(S[i]==0 && S[i+1]==1){
       if(S[i+2]==0){
-      // list<int> index_bottom;
-      //  index_bottom.push_fornt(i);
-      //  index_bottom.push_back(i);
-      //  index_bottom.push_back(i+1);
+        // index_bottom.push_back(i);
         S[i+1]=0;S[i+2]=1;
         enumerate(parent,n);
         S[i+1]=1;S[i+2]=0;
@@ -405,8 +421,34 @@ int enumerate(int parent,int n){
       break;
     }
   }
+
+// //  showlist(index_bottom);
+//   for(itr_bottom = index_bottom.begin(); itr_bottom!= index_bottom.end(); ++itr_bottom){
+//     obj_data_bottom.S = S;
+//     obj_data_bottom.index=index_bottom;
+//     index_bottom_data.push(obj_data_bottom);
+//     S[int(*itr_bottom)+1]=0; S[int(*itr_bottom)+2]=1;
+//     // printf("itr_bottom = ");
+//     // cout << *itr_bottom;
+//     // printf("\n");
+//     enumerate(parent,n);
+//     obj_data_bottom = index_bottom_data.top();
+//     S = obj_data_bottom.S;
+//     index_bottom = obj_data_bottom.index;
+//     // index_bottom = index_bottom_data.top();
+//     index_bottom_data.pop();
+//     // printf("index_bottom = ");
+//     // showlist(index_bottom);
+//     // printf("\n");
+//     // printf("itr_bottom = ");
+//     // cout << *itr_bottom;
+//     // printf("\n");
+//     // S[int(*itr_bottom)+1]=1; S[int(*itr_bottom)+2]=0;
+//   }
   return 1;
 }
+
+
 
 
 
@@ -414,7 +456,7 @@ int main(){
   int i;
   FILE *fp;
 
-  index_top.push_back(0);
+  // index_test_top.push_back(0);
 
   fp=fopen("NumberBPG","w");
   fp1=fopen("pattern1","w");
