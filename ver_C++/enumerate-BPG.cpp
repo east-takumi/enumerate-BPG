@@ -12,7 +12,7 @@ using namespace std;
 #define N 16
 // #define N 6
 
-array<int, 2*N> S;
+array<int, 2*N> S, S0, S1, S2, S3;
 long num=0;
 int G[N][N];
 int p1,p2,p3,p4,p5;
@@ -32,6 +32,97 @@ stack<data> index_up_data, index_bottom_data;
 
 // list<array<int, 2>>::iterator *itr = nullptr;
 FILE *fp1,*fp2,*fp3,*fp4,*fp5;
+
+class doublylinkedlist {
+   public:
+    struct node {
+      int val;
+      node* next;
+      node* prev;
+      node(int v_) : val(v_),next(NULL),prev(NULL) {};
+    };
+    node* head;
+    node* tail;
+
+    doublylinkedlist() {
+      head = NULL;
+      tail = NULL;
+    }
+    void printFromHead() {
+      node* temp = head;
+      cout<<"[ ";
+      while(temp) {
+        cout<<temp->val<<" ";
+        temp = temp->next;
+      }
+      cout<<"]"<<endl;
+    }
+    void printFromTail() {
+       node* temp = tail;
+       cout<<"[ ";
+       while(temp) {
+         cout<<temp->val<<" ";
+         temp = temp->prev;
+       }
+       cout<<"]"<<endl;
+    }
+    void addFromHead(int v_) {
+      if(head == NULL && tail == NULL) {
+        head = new node(v_);
+        tail = head;
+      }
+      else {
+        node* cur = head;
+        while(cur && v_ > cur->val) {
+          cur = cur->next;
+        }
+        if(cur == head) {
+          cur->prev = new node(v_);
+          cur->prev->next = head;
+          head = cur->prev;
+        }
+        else if(cur) {
+          cur->prev->next = new node(v_);
+          cur->prev->next->next = cur;
+          cur->prev->next->prev = cur->prev;
+          cur->prev = cur->prev->next;
+        }
+        else if(!cur) {
+          tail->next = new node(v_);
+          tail->next->prev = tail;
+          tail = tail->next;
+        }
+      }
+    }
+    void addFromTail(int v_) {
+      if(head == NULL && tail == NULL) {
+        tail = new node(v_);
+        head = head;
+      }
+      else {
+        node* cur = tail;
+        while(cur && v_ <= cur->val) {
+          cur = cur->prev;
+        }
+        if(cur == tail) {
+          cur->next = new node(v_);
+          cur->next->prev = tail;
+          tail = cur->next;
+        }
+        else if(cur) {
+          cur->next->prev = new node(v_);
+          cur->next->prev->prev = cur;
+          cur->next->prev->next = cur->next;
+          cur->next = cur->next->prev;
+        }
+        else if(!cur) {
+          head->prev = new node(v_);
+          head->prev->next = head;
+          head = head->prev;
+        }
+      }
+    }
+};
 
 //Initialize of Sequence
 int initialize(int n){
@@ -238,6 +329,7 @@ int check(int n){
   int i,sum=0,c1,c2,c3,c4;
   int Q[N];
   int S0[2*N],S1[2*N],S2[2*N],S3[2*N];
+  doublylinkedlist index;
   /*
     S0=S, S1 is reverse of S0
     S2 is reverse on permutation of S0
@@ -260,6 +352,7 @@ int check(int n){
   // printf("S1= ");
   // for(i=0 ; i<2*n ; i++) printf("%d",S1[i]);
   // printf("\n");
+
 
   reverse_on_perm(S2,n);
   // printf("S2= ");
@@ -375,7 +468,6 @@ int enumerate(int parent,int n){
       // break;
     }
   }
-
 
   // showlist(index_upper);
   for(itr_upper = index_upper.begin(); itr_upper!= index_upper.end(); ++itr_upper){
